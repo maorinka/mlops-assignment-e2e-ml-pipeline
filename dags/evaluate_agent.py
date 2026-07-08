@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import tarfile
 import time
@@ -13,6 +14,7 @@ from airflow.sdk import Param, dag, get_current_context, task
 
 PROJECT_ROOT = Path(os.environ.get("PROJECT_ROOT", Path(__file__).resolve().parents[1])).expanduser()
 RUNS_ROOT = Path(os.environ.get("RUNS_ROOT", PROJECT_ROOT / "runs")).expanduser()
+UV_BIN = os.environ.get("UV_BIN") or shutil.which("uv") or str(Path.home() / ".local/bin" / "uv")
 MINI_SWE_CONFIG = (
     Path(
         os.environ.get(
@@ -116,7 +118,7 @@ def run_agent_batch(run_config: dict[str, Any]) -> Path:
         "MSWEA_COST_TRACKING": "ignore_errors",
     }
     cmd = [
-        "uv",
+        UV_BIN,
         "run",
         "mini-extra",
         "swebench",
@@ -154,7 +156,7 @@ def run_swebench_eval(run_config: dict[str, Any], preds_path: str) -> Path:
     eval_dir = RUNS_ROOT / run_config["run_id"] / "run-eval"
     eval_dir.mkdir(parents=True, exist_ok=True)
     cmd = [
-        "uv",
+        UV_BIN,
         "run",
         "python",
         "-m",
