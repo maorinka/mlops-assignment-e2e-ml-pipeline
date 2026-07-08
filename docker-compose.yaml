@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.14.0
+    command:
+      - mlflow
+      - server
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5000"
+      - --backend-store-uri
+      - sqlite:////mlflow/mlflow.db
+      - --artifacts-destination
+      - /mlflow/artifacts
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-data:/mlflow
+
+  airflow:
+    image: apache/airflow:3.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      RUNS_ROOT: /opt/airflow/runs
+      PROJECT_ROOT: /opt/airflow/project
+      MINI_SWE_CONFIG: /opt/mini-swe-agent/src/minisweagent/config/benchmarks/swebench.yaml
+      _PIP_ADDITIONAL_REQUIREMENTS: mlflow==3.14.0 boto3==1.43.43 mini-swe-agent==2.4.1 swebench==4.1.0
+    user: "${AIRFLOW_UID:-50000}:0"
+    command: >
+      bash -c "
+      airflow db migrate &&
+      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com || true &&
+      airflow standalone
+      "
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./runs:/opt/airflow/runs
+      - ./:/opt/airflow/project
+      - ../mini-swe-agent:/opt/mini-swe-agent:ro
+      - ../SWE-bench:/opt/SWE-bench:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  postgres-db-volume:
+  mlflow-data:

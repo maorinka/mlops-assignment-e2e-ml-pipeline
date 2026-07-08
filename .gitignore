@@ -10,3 +10,7 @@ __pycache__
 
 mini-swe-agent/
 SWE-bench/
+
+PLAN.md
+runs/
+.env

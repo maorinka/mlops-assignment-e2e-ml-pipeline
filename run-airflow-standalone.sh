@@ -8,4 +8,9 @@ mkdir -p $AIRFLOW_HOME
 
 echo '{"admin": "admin"}' > $AIRFLOW_HOME/simple_auth_manager_passwords.json.generated
 
-uv tool run apache-airflow standalone
+UV_BIN=${UV_BIN:-$(command -v uv || true)}
+if [ -z "$UV_BIN" ] && [ -x "$HOME/.local/bin/uv" ]; then
+  UV_BIN="$HOME/.local/bin/uv"
+fi
+
+"$UV_BIN" tool run apache-airflow standalone
