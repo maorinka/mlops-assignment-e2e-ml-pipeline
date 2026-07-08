@@ -132,13 +132,13 @@ def run_agent_batch(run_config: dict[str, Any]) -> Path:
         run_config["task_slice"],
         "--workers",
         str(run_config["workers"]),
-        "--cost-limit",
-        str(run_config["cost_limit"]),
         "--config",
         str(MINI_SWE_CONFIG),
         "-o",
         str(output_dir),
     ]
+    if float(run_config["cost_limit"]) > 0:
+        print("cost_limit is recorded in config but not forwarded: mini-extra swebench 2.4.1 has no --cost-limit option")
     subprocess.run(cmd, cwd=PROJECT_ROOT, env=env, check=True)
     preds_path = output_dir / "preds.json"
     if not preds_path.exists() or preds_path.stat().st_size == 0:
@@ -153,6 +153,10 @@ def run_swebench_eval(run_config: dict[str, Any], preds_path: str) -> Path:
     subset = run_config["subset"]
     if subset not in DATASETS:
         raise ValueError(f"Unsupported subset {subset!r}; expected one of {sorted(DATASETS)}")
+    predictions = json.loads(Path(preds_path).read_text())
+    instance_ids = sorted(predictions)
+    if not instance_ids:
+        raise ValueError(f"No instance ids found in predictions file: {preds_path}")
     eval_dir = RUNS_ROOT / run_config["run_id"] / "run-eval"
     eval_dir.mkdir(parents=True, exist_ok=True)
     cmd = [
@@ -165,6 +169,8 @@ def run_swebench_eval(run_config: dict[str, Any], preds_path: str) -> Path:
         DATASETS[subset],
         "--predictions_path",
         str(Path(preds_path).resolve()),
+        "--instance_ids",
+        *instance_ids,
         "--max_workers",
         str(run_config["workers"]),
         "--run_id",
@@ -287,27 +293,50 @@ def upload_artifacts_if_configured(run_config: dict[str, Any]) -> str | None:
 
 
 def log_mlflow_run(run_config: dict[str, Any], metrics: dict[str, Any], manifest: dict[str, Any]) -> None:
-    import mlflow
-
     run_dir = RUNS_ROOT / run_config["run_id"]
     eval_dir = run_dir / "run-eval"
     summary_path = find_summary_report(eval_dir, run_config["run_id"])
-    mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5000"))
-    mlflow.set_experiment("swe-bench-eval")
-    with mlflow.start_run(run_name=run_config["run_id"]):
-        flat_params = {
-            key: value
-            for key, value in run_config.items()
-            if isinstance(value, (str, int, float, bool))
-        }
-        mlflow.log_params(flat_params)
-        mlflow.log_metrics({key: float(value) for key, value in metrics.items()})
-        mlflow.set_tag("artifact_path", str(run_dir))
-        if manifest.get("s3_uri"):
-            mlflow.set_tag("s3_uri", manifest["s3_uri"])
-        for name in SMALL_ARTIFACTS:
-            mlflow.log_artifact(str(run_dir / name))
-        mlflow.log_artifact(str(summary_path))
+    script = """
+import json
+import os
+import sys
+from pathlib import Path
+
+import mlflow
+
+tracking_uri, run_dir, summary_path = sys.argv[1:4]
+run_dir = Path(run_dir)
+summary_path = Path(summary_path)
+run_config = json.loads((run_dir / "config.json").read_text())
+metrics = json.loads((run_dir / "metrics.json").read_text())
+manifest = json.loads((run_dir / "manifest.json").read_text())
+mlflow.set_tracking_uri(tracking_uri)
+mlflow.set_experiment("swe-bench-eval")
+with mlflow.start_run(run_name=run_config["run_id"]):
+    flat_params = {k: v for k, v in run_config.items() if isinstance(v, (str, int, float, bool))}
+    mlflow.log_params(flat_params)
+    mlflow.log_metrics({k: float(v) for k, v in metrics.items()})
+    mlflow.set_tag("artifact_path", str(run_dir))
+    if manifest.get("s3_uri"):
+        mlflow.set_tag("s3_uri", manifest["s3_uri"])
+    for name in ("config.json", "metrics.json", "manifest.json"):
+        mlflow.log_artifact(str(run_dir / name))
+    mlflow.log_artifact(str(summary_path))
+"""
+    subprocess.run(
+        [
+            UV_BIN,
+            "run",
+            "python",
+            "-c",
+            script,
+            os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5000"),
+            str(run_dir),
+            str(summary_path),
+        ],
+        cwd=PROJECT_ROOT,
+        check=True,
+    )
 
 
 def summarize_run(run_config: dict[str, Any], eval_dir: str | Path) -> dict[str, Any]:
