@@ -13,4 +13,11 @@ SWE-bench/
 
 PLAN.md
 runs/
+!runs/
+!runs/report-20260708-212813/
+!runs/report-20260708-212813/config.json
+!runs/report-20260708-212813/metrics.json
+!runs/report-20260708-212813/manifest.json
+!runs/report-20260708-212813/run-eval/
+!runs/report-20260708-212813/run-eval/nebius__moonshotai__Kimi-K2.6.report-20260708-212813.json
 .env

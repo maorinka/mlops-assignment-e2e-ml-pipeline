@@ -1,0 +1,125 @@
+{
+  "files": [
+    {
+      "path": "config.json",
+      "size": 394
+    },
+    {
+      "path": "metrics.json",
+      "size": 258
+    },
+    {
+      "path": "run-agent/astropy__astropy-12907/astropy__astropy-12907.traj.json",
+      "size": 207853
+    },
+    {
+      "path": "run-agent/astropy__astropy-13033/astropy__astropy-13033.traj.json",
+      "size": 1533354
+    },
+    {
+      "path": "run-agent/astropy__astropy-13236/astropy__astropy-13236.traj.json",
+      "size": 603381
+    },
+    {
+      "path": "run-agent/exit_statuses_1783546100.4574885.yaml",
+      "size": 128
+    },
+    {
+      "path": "run-agent/minisweagent.log",
+      "size": 2292
+    },
+    {
+      "path": "run-agent/preds.json",
+      "size": 5278
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/eval.sh",
+      "size": 2123
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/patch.diff",
+      "size": 504
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/report.json",
+      "size": 2123
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/run_instance.log",
+      "size": 4339
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/test_output.txt",
+      "size": 298469
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13033/eval.sh",
+      "size": 1618
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13033/patch.diff",
+      "size": 2261
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13033/report.json",
+      "size": 2662
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13033/run_instance.log",
+      "size": 8271
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13033/test_output.txt",
+      "size": 311109
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13236/eval.sh",
+      "size": 4655
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13236/patch.diff",
+      "size": 1924
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13236/report.json",
+      "size": 63349
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13236/run_instance.log",
+      "size": 55868
+    },
+    {
+      "path": "run-eval/logs/run_evaluation/report-20260708-212813/nebius__moonshotai__Kimi-K2.6/astropy__astropy-13236/test_output.txt",
+      "size": 360268
+    },
+    {
+      "path": "run-eval/nebius__moonshotai__Kimi-K2.6.report-20260708-212813.json",
+      "size": 728
+    }
+  ],
+  "metrics": {
+    "path": "metrics.json",
+    "sha256": "73e28e56d7487556dcf056448ba277f5dabf3654810e4ded7cdd74861d09871a",
+    "size": 258,
+    "values": {
+      "completed_instances": 3,
+      "duration_s": 395.78411,
+      "empty_patch_instances": 0,
+      "error_instances": 0,
+      "resolved_instances": 2,
+      "resolved_rate": 0.6666666666666666,
+      "submitted_instances": 3,
+      "total_instances": 3,
+      "unresolved_instances": 1
+    }
+  },
+  "preds": {
+    "path": "run-agent/preds.json",
+    "sha256": "889fc18b1c68f826d63c64f6fe7a8f63cf19ecf843d1156fafce5ec0baf13ff5",
+    "size": 5278
+  },
+  "run_dir": "/home/maorhadad/mlops-assignment-e2e-ml-pipeline/runs/report-20260708-212813",
+  "run_id": "report-20260708-212813",
+  "s3_uri": null,
+  "summary_report": "run-eval/nebius__moonshotai__Kimi-K2.6.report-20260708-212813.json"
+}
